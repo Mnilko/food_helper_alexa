@@ -1,2 +1,3 @@
 welcome: Food helper serve you.
 helper: You can ask for nutritions.
+food_info: Proteins {{result['protein']}}, carbs {{result['carbs']}}, fat {{result['fat']}}.

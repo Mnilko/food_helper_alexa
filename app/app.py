@@ -1,10 +1,13 @@
 from flask import Flask
 from flask_ask import Ask, statement, question
 from fatsecret import Fatsecret
-import json
+from flask_sqlalchemy import SQLAlchemy
+from config import Configuration
 
 app = Flask(__name__)
 ask = Ask(app, "/")
+app.config.from_object(Configuration)
+db = SQLAlchemy(app)
 consumer_key = '17f7ebda44884922819ed3af418aa7d5'
 consumer_secret = '79a0301cfd6847b2bd40cca8a3c9fa16'
 fs = Fatsecret(consumer_key, consumer_secret)

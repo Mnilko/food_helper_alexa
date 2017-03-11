@@ -22,21 +22,17 @@ from models import *
 from fat_secret import fat_secret
 from user_intent import user_intent
 from nutriotion_list_intent import nutriotion_list_intent
+from daily_intent import daily_intent
 
 @ask.launch
 def greeter():
     ask_msg = 'Hi, there! What is your name?'
     return question(ask_msg)
 
-@ask.intent("AMAZON.NoIntent")
-def no_handler():
-    if session.attributes['user_name']:
-        response_msg = 'You can only ask about food info without user.'
-    return statement(response_msg)
-
 @ask.intent('AMAZON.CancelIntent')
 @ask.intent('AMAZON.StopIntent')
-def trip_nogo():
+@ask.intent("AMAZON.NoIntent")
+def bye_bye():
     quit_msg = "Good luck in gym."
     return statement(quit_msg)
 

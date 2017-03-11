@@ -21,3 +21,14 @@ def current_intent(self, arg):
             print(daily)
             response_msg = "You ate %i proteins, %i carbs, %i fats today." % (daily.protein, daily.carb, daily.fat)
             return question(response_msg)
+
+@ask.intent('DailyAddNutritionIntent', mapping={'nutrition': 'Nutrition', 'value': 'Value'})
+def add_nutriotion(nutrition, value):
+    if ('user_id' not in session.attributes):
+        return question("Can't find without user. What is your name?")
+    elif ('nutrition' is None) | ('value' is None):
+
+    else:
+        user = User.query.get(session.attributes['user_id'])
+        daily = Daily.query.filter(Daily.users.contains(user) & (Daily.created_timestamp >= datetime.date.today())).first()
+        setattr(daily, , 10)

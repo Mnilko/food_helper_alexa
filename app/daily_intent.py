@@ -4,7 +4,7 @@ from models import *
 daily_intent = Blueprint('daily_intent', __name__)
 
 @ask.intent('CurrentDailyIntent')
-def current_intent(self, arg):
+def current_intent():
     if 'user_id' not in session.attributes:
         return question("Can't find without user. What is your name?")
     else:
@@ -26,9 +26,12 @@ def current_intent(self, arg):
 def add_nutriotion(nutrition, value):
     if ('user_id' not in session.attributes):
         return question("Can't find without user. What is your name?")
-    elif ('nutrition' is None) | ('value' is None):
-
+    elif (nutrition is None) | (value is None):
+        return question("Please, provide nutriotion and amout.")
     else:
         user = User.query.get(session.attributes['user_id'])
         daily = Daily.query.filter(Daily.users.contains(user) & (Daily.created_timestamp >= datetime.date.today())).first()
-        setattr(daily, , 10)
+        setattr(daily, nutrition, int(value))
+        db.session.commit()
+        response_msg = "You daily summary: %i proteins, %i carbs, %i fats." % (daily.protein, daily.carb, daily.fat)
+        return question(response_msg)

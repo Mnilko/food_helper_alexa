@@ -85,6 +85,22 @@ def left_nutriotion():
             protein_left = user.protein - daily.protein
             carb_left = user.carb - daily.carb
             fat_left = user.fat - daily.fat
-            response_msg = "You need to eat: %i protein, %i carbs, %i fat." % (protein_left, carb_left, fat_left)
+            if (protein_left > 0) | (carb_left > 0) | (fat_left > 0):
+                response_msg = "You need to eat: "
+                if protein_left > 0:
+                    response_msg += "protein %s " % protein_left
+                if carb_left > 0:
+                    response_msg += "carbs %s " % carb_left
+                if fat_left > 0:
+                    response_msg += "fats %s " % fat_left
+            if (protein_left <= 0) | (carb_left <= 0) | (fat_left > 0):
+                response_msg = "You need to stop eat: "
+                if protein_left <= 0:
+                    response_msg += "protein %s " % protein_left
+                if carb_left <= 0:
+                    response_msg += "carbs %s " % carb_left
+                if fat_left <= 0:
+                    response_msg += "fats %s " % fat_left
+
         return question(response_msg)\
           .reprompt("Do you want to continue?")

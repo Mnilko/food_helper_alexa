@@ -7,8 +7,7 @@ def food_info(food_name):
     try:
         food_result = fs.foods_search(food_name)
         food_descript = food_result[0]['food_description']
-        food_info_msg = "I find %s. %s" % (food_name, food_descript)
-        return question(food_info_msg)
+        response_msg = "I find %s. %s" % (food_name, food_descript)
     except KeyError:
-        food_info_msg = "I can't find these food."
-        return question(food_info_msg)
+        response_msg = "I can't find these food."
+    return question(response_msg)

@@ -14,22 +14,31 @@ def get_user(user_name):
     else:
         session.attributes['user_id'] = user.id
         response_msg = "Hi %s, I'm glad to see you again!!! What you want to do next?" % user_name
-    return question(response_msg)
+    return question(response_msg)\
+      .reprompt('Do you want to continue?')
 
-@ask.intent("CreateUserIntent")
+@ask.intent('AMAZON.YesIntent')
+@ask.intent('CreateUserIntent')
 def create_user():
     if session.attributes['user_name']:
-        new_user = User(name=session.attributes['user_name'])
-        db.session.add(new_user)
-        db.session.commit()
-        session.attributes['user_id'] = new_user.id
-        response_msg = 'User with name %s created.' % session.attributes['user_name']
+        user = User.query.filter(User.name == user_name).first()
+        if (user is None):
+            new_user = User(name=session.attributes['user_name'])
+            db.session.add(new_user)
+            db.session.commit()
+            session.attributes['user_id'] = new_user.id
+            response_msg = 'User with name %s created.' % session.attributes['user_name']
+        else:
+            session.attributes['user_id'] = user.id
+            response_msg = 'User with these name already exist. You are logged in as %s' % user.name
     else:
         response_msg = "Can't create user with these name."
-    return question(response_msg)
+    return question(response_msg)\
+      .reprompt('Do you want to continue?')
 
-@ask.intent("ChangeUserIntent")
+@ask.intent('ChangeUserIntent')
 def change_user():
     session.attributes['user_name'] = None
     session.attributes['user_id'] = None
-    return question('What is your name?')
+    return question('What is your name?')\
+      .reprompt('What is your name?')

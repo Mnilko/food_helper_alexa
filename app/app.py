@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint
+from flask import Flask, Blueprint, request
 from flask_ask import Ask, statement, question, session
 from fatsecret import Fatsecret
 from flask_migrate import Migrate, MigrateCommand
@@ -24,6 +24,18 @@ from user_intent import user_intent
 from nutriotion_list_intent import nutriotion_list_intent
 from daily_intent import daily_intent
 
+without_user = [
+  'FoodInfoIntent','AMAZON.StopIntent', 'AMAZON.CancelIntent', "AMAZON.HelpIntent",
+  'AMAZON.NoIntent', 'DefineUserIntent', 'CreateUserIntent', 'ChangeUserIntent'
+]
+
+@app.before_request
+def before_request():
+    intent = request.json['request']['intent']['name']
+    if intent not in without_user:
+      print('Intent name is %s' % intent)
+
+
 @ask.launch
 def greeter():
     ask_msg = 'Hi, there! What is your name?'
@@ -34,13 +46,20 @@ def greeter():
 @ask.intent('AMAZON.CancelIntent')
 @ask.intent('AMAZON.StopIntent')
 def bye_bye():
-    quit_msg = "Good luck in gym."
+    quit_msg = 'Good luck in gym.'
     return statement(quit_msg)
 
-@ask.intent("HelpIntent")
+@ask.intent('AMAZON.HelpIntent')
 def helper():
-    helper_msg = 'You can ask for nutritions.'
-    return question(helper_msg)
+    helper_msg = 'You can search food info, set your daily nutriotion needs, calculate nutritions for current date.'
+    return question(helper_msg)\
+      .reprompt('You can search food info, set your daily nutriotion needs, calculate nutritions for current date.')
+
+@ask.intent('AMAZON.NoIntent')
+def no_handler():
+    response_msg = 'You can search for food.'
+    return question(response_msg)\
+      .reprompt('You can search for food.')
 
 if __name__ == '__main__':
     app.run(debug=True)

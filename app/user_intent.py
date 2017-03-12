@@ -33,9 +33,3 @@ def change_user():
     session.attributes['user_name'] = None
     session.attributes['user_id'] = None
     return question('What is your name?')
-
-@ask.intent('AMAZON.NoIntent')
-def no_handler():
-    response_msg = "You can search for food."
-    return question(response_msg)\
-      .reprompt('You can search for food.')

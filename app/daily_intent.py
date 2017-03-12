@@ -6,7 +6,8 @@ daily_intent = Blueprint('daily_intent', __name__)
 @ask.intent('CurrentDailyIntent')
 def current_intent():
     if 'user_id' not in session.attributes:
-        return question("Can't find without user. What is your name?")
+        return question("Can't find without user. What is your name?")\
+          .repromt("Please provide name or use food search.")
     else:
         user = User.query.get(session.attributes['user_id'])
         daily = Daily.query.filter(Daily.users.contains(user) & (Daily.created_timestamp >= datetime.date.today())).first()
@@ -16,31 +17,65 @@ def current_intent():
             db.session.add(daily)
             db.session.commit()
             response_msg = "You didn't add any food today. Do you want to add something?"
-            return question(response_msg)
+            return question(response_msg)\
+              .reprompt("Do you want to continue?")
         else:
-            print(daily)
             response_msg = "You ate %i proteins, %i carbs, %i fats today." % (daily.protein, daily.carb, daily.fat)
-            return question(response_msg)
+            return question(response_msg)\
+              .reprompt("Do you want to continue?")
 
 @ask.intent('DailyAddNutritionIntent', mapping={'nutrition': 'Nutrition', 'value': 'Value'})
 def add_nutriotion(nutrition, value):
     if ('user_id' not in session.attributes):
-        return question("Can't find without user. What is your name?")
+        return question("Can't find without user. What is your name?")\
+          .repromt("Please provide name or use food search.")
     elif (nutrition is None) | (value is None):
-        return question("Please, provide nutriotion and amout.")
+        return question("Please, provide nutriotion and amout.")\
+          .reprompt("Do you want to continue?")
     else:
         user = User.query.get(session.attributes['user_id'])
         daily = Daily.query.filter(Daily.users.contains(user) & (Daily.created_timestamp >= datetime.date.today())).first()
+        if daily is None:
+            daily = Daily()
+            user.dailies.append(daily)
+            db.session.add(daily)
+            db.session.commit()
         sum_value = daily.__getattribute__(nutrition) + int(value)
         setattr(daily, nutrition, sum_value)
         db.session.commit()
-        response_msg = "You daily summary: %i proteins, %i carbs, %i fats." % (daily.protein, daily.carb, daily.fat)
-        return question(response_msg)
+        response_msg = "You ate %i %s" % (sum_value, nutriotion)
+        return question(response_msg)\
+          .reprompt("Do you want to continue?")
+
+@ask.intent('DailyAddNutritionListIntent', mapping={'protein': 'Protein', 'fat': 'Fat', 'carb': 'Carb'})
+def add_nutriotion_list(protein, fat, carb):
+    if ('user_id' not in session.attributes):
+        return question("Can't find without user. What is your name?")\
+          .repromt("Please provide name or use food search.")
+    elif (protein is None) | (fat is None) | (carb is None):
+        return question("Please, provide nutriotion and amout.")\
+          .reprompt("Do you want to continue?")
+    else:
+        user = User.query.get(session.attributes['user_id'])
+        daily = Daily.query.filter(Daily.users.contains(user) & (Daily.created_timestamp >= datetime.date.today())).first()
+        if daily is None:
+            daily = Daily()
+            user.dailies.append(daily)
+            db.session.add(daily)
+            db.session.commit()
+        setattr(daily, 'protein', (daily.protein + int(protein)))
+        setattr(daily, 'fat', (daily.fat + int(fat)))
+        setattr(daily, 'carb', (daily.carb + int(carb)))
+        db.session.commit()
+        response_msg = "Your updated daily summary: %s proteins, %s carbs, %s fats" % (daily.protein, daily.carb, daily.fat)
+        return question(response_msg)\
+          .reprompt("Do you want to continue?")
 
 @ask.intent('DailyLeftNutritionIntent')
 def left_nutriotion():
     if ('user_id' not in session.attributes):
-        return question("Can't find without user. What is your name?")
+        return question("Can't find without user. What is your name?")\
+          .repromt("Please provide name or use food search.")
     else:
         user = User.query.get(session.attributes['user_id'])
         daily = Daily.query.filter(Daily.users.contains(user) & (Daily.created_timestamp >= datetime.date.today())).first()
@@ -50,10 +85,12 @@ def left_nutriotion():
             db.session.add(daily)
             db.session.commit()
             response_msg = "You didn't add any food today. Do you want to add something?"
-            return question(response_msg)
+            return question(response_msg)\
+              .reprompt("Do you want to continue?")
         else:
             protein_left = user.protein - daily.protein
             carb_left = user.carb - daily.carb
             fat_left = user.fat - daily.fat
             response_msg = "You need to eat: %i protein, %i carbs, %i fat." % (protein_left, carb_left, fat_left)
-            return question(response_msg)
+            return question(response_msg)\
+              .reprompt("Do you want to continue?")

@@ -22,5 +22,5 @@ def change_nutrition_value(nutrition, value):
         user = User.query.get(session.attributes['user_id'])
         setattr(user, nutrition, int(value))
         db.session.commit()
-        response_msg = "%s goal seted to %s" % (nutrition, user.__getattribute__(nutrition))
+        response_msg = "%s goal setted to %s" % (nutrition, user.__getattribute__(nutrition))
         return question(response_msg)

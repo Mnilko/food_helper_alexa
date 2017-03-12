@@ -5,6 +5,8 @@ user_intent = Blueprint('user_intent', __name__)
 
 @ask.intent("DefineUserIntent", mapping={'user_name': 'Name'})
 def get_user(user_name):
+    if (user_name is None):
+        return question('Please, repeat your name')
     user = User.query.filter(User.name == user_name).first()
     if (user is None):
         session.attributes['user_name'] = user_name
@@ -25,3 +27,15 @@ def create_user():
     else:
         response_msg = "Can't create user with these name."
     return question(response_msg)
+
+@ask.intent("ChangeUserIntent")
+def change_user():
+    session.attributes['user_name'] = None
+    session.attributes['user_id'] = None
+    return question('What is your name?')
+
+@ask.intent('AMAZON.NoIntent')
+def no_handler():
+    response_msg = "You can search for food."
+    return question(response_msg)\
+      .reprompt('You can search for food.')

@@ -27,11 +27,12 @@ from daily_intent import daily_intent
 @ask.launch
 def greeter():
     ask_msg = 'Hi, there! What is your name?'
-    return question(ask_msg)
+    return question(ask_msg)\
+      .reprompt('Hi, there! What is your name?')
+
 
 @ask.intent('AMAZON.CancelIntent')
 @ask.intent('AMAZON.StopIntent')
-@ask.intent("AMAZON.NoIntent")
 def bye_bye():
     quit_msg = "Good luck in gym."
     return statement(quit_msg)
